@@ -3,6 +3,10 @@ from bs4 import BeautifulSoup
 import re
 import smtplib
 import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from dotenv import load_dotenv
+load_dotenv()
 
 shops = [
                         'Albert Heijn',
@@ -42,31 +46,23 @@ beer_discount = sorted(beer_discount, key=lambda k: k['price'], reverse=True)
 def generatebody():
         body = []
         for i in range(0,len(beer_discount)):
-                body.append('Winkel:\t'+beer_discount[i]['name']+'\n')
-                body.append('Merk:\t'+beer_discount[i]['brand']+'\n')
-                body.append('Prijs:\t'+(beer_discount[i]['price'])+' - '+beer_discount[i]['product']+'\n')
-                body.append('Geldig:\t'+beer_discount[i]['valid']+'\n')
-                body.append('\n')
+                body.append('Winkel:\t'+beer_discount[i]['name']+'<br/>')
+                body.append('Merk:\t'+beer_discount[i]['brand']+'<br/>')
+                body.append('Prijs:\t'+(beer_discount[i]['price'])+' - '+beer_discount[i]['product']+'<br/>')
+                body.append('Geldig:\t'+beer_discount[i]['valid']+'<br/>')
+                body.append('<br/>')
         return ''.join(body)
 
-gmail_user = os.environ['gmail_user']
-gmail_password = os.environ['gmail_pass']
-
-sent_from = os.environ['gmail_user']
-to = os.environ['gmail_user']
-subject = 'Bier aanbiedingen - Daily'
-body = generatebody()
-
-email_text = """\
-From: %s
-To: %s
-Subject: %s
-
-%s
-""" % (sent_from, ", ".join(to), subject, body)
-
-server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-server.ehlo()
-server.login(gmail_user, gmail_password)
-server.sendmail(sent_from, to, email_text.encode('utf8'))
-server.close
+message = Mail(
+    from_email=os.getenv('FROM'),
+    to_emails=os.getenv('TO'),
+    subject='Bier aanbiedingen - Daily',
+    html_content=generatebody())
+try:
+    sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+    response = sg.send(message)
+    print(response.status_code)
+    print(response.body)
+    print(response.headers)
+except Exception as e:
+    print(e.message)
