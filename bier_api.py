@@ -42,7 +42,7 @@ def index():
         for dc in r_discount:
                 if dc["soort_uid"] in brands and dc["winkel_uid"] in shops:
                         discounts.append('Winkel: '+shops[dc["winkel_uid"]]+'</br>')
-                        discounts.append('Merk: '+brands[dc["soort_uid"]]+'</br>')
+                        discounts.append('Merk: '+dc["aantal"]+'x '+brands[dc["soort_uid"]]+'</br>')
                         discounts.append('Prijs: €'+dc["voorprijs"]+'</br>')
                         discounts.append('Geldig tot: '+dc["einddatum"]+'</br>')
                         discounts.append('</br>')
