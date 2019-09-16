@@ -1,12 +1,10 @@
 from flask import Flask
-from flask_caching import Cache
 import requests
 import json
 import logging
 import logging.handlers
 
 app = Flask(__name__)
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 handler = logging.handlers.RotatingFileHandler(
         'log.txt',
@@ -17,7 +15,6 @@ app.logger.setLevel(logging.WARNING)
 app.logger.addHandler(handler)
 
 @app.route('/')
-@cache.cached(timeout=14400)
 def index():
 	payload = {'d': ''}
 	headers = {'User-Agent': 'nl.Biernet.iOS.app/V3'}
@@ -44,11 +41,25 @@ def index():
 	}
 
 	discounts = []
+
+	discounts.append('<div class="background">')
+	discounts.append('<div class="container">')
+	discounts.append('<div class="title">')
+	discounts.append('<h1>Bier aanbiedingen</h1>')
+	discounts.append('</div>')
+	discounts.append('</div>')
+	discounts.append('<div class="container">')
+
 	for dc in r_discount:
 		if dc["soort_uid"] in brands and dc["winkel_uid"] in shops:
-			discounts.append('Winkel: '+shops[dc["winkel_uid"]]+'</br>')
-			discounts.append('Merk: '+dc["aantal"]+'x '+brands[dc["soort_uid"]]+'</br>')
-			discounts.append('Prijs: €'+dc["voorprijs"]+'</br>')
-			discounts.append('Geldig t/m: '+dc["einddatum"]+'</br>')
-			discounts.append('</br>')
+			discounts.append('<div class="card">')
+			discounts.append('<div class="card__shop">Winkel: %s</div>' % shops[dc["winkel_uid"]])
+			discounts.append('<div class="card__brand">Merk: %s x %s</div>' % (dc["aantal"], brands[dc["soort_uid"]]))
+			discounts.append('<div class="card__price">Prijs: %s</div>' % dc["voorprijs"])
+			discounts.append('<div class="card__date">Geldig t/m: %s</div>' % dc["einddatum"])
+			discounts.append('</div>')
+	
+	discounts.append('</div>')
+	discounts.append('</div>')
+
 	return ''.join(discounts)
