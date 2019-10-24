@@ -1,10 +1,10 @@
 from flask import Flask, render_template
-from flask_caching import Cache
+#from flask_caching import Cache
 import requests
 import json
 
 app = Flask(__name__)
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+#cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 @app.route('/')
 #@cache.cached(timeout=14400)
