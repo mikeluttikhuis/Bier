@@ -7,7 +7,7 @@ app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 @app.route('/')
-@cache.cached(timeout=14400)
+#@cache.cached(timeout=14400)
 def index():
 	payload = {'d': ''}
 	headers = {'User-Agent': 'nl.Biernet.iOS.app/V3'}
